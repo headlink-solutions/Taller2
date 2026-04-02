@@ -1,0 +1,7 @@
+{
+  "name": "SOS Automotriz",
+  "description": "Sistema Operativo de Servicio para talleres de alta precisión con gestión de bahías, técnicos y recepción digital.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

@@ -81,6 +81,17 @@ export const ActiveReception = ({ onConfirm }: { onConfirm: () => void }) => {
   const [lastServiceInfo, setLastServiceInfo] = useState<{ name: string; date: any } | null>(null);
   const [isSearchingCustomer, setIsSearchingCustomer] = useState(false);
 
+  // Financial States
+  const [grossIncome, setGrossIncome] = useState<number>(0);
+  const [consumableCost, setConsumableCost] = useState<number>(0);
+  const [otherCosts, setOtherCosts] = useState<number>(0);
+  const [reinvestedAmount, setReinvestedAmount] = useState<number>(0);
+  const [distributedAmount, setDistributedAmount] = useState<number>(0);
+
+  const netUtility = Math.max(0, grossIncome - consumableCost - otherCosts);
+  const distributionTotal = reinvestedAmount + distributedAmount;
+  const isDistributionValid = distributionTotal <= netUtility;
+
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const phone = e.target.value.replace(/\D/g, '');
     setCustomerPhone(phone);
@@ -603,6 +614,91 @@ export const ActiveReception = ({ onConfirm }: { onConfirm: () => void }) => {
       </section>
 
       <section className="space-y-3">
+        <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 px-1">INFORMACIÓN FINANCIERA</h3>
+        <div className="bg-surface-high p-6 rounded-lg border border-white/5 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase ml-1">Ingreso Bruto</label>
+              <input 
+                type="number"
+                value={grossIncome || ''}
+                onChange={(e) => setGrossIncome(Number(e.target.value))}
+                placeholder="$0.00"
+                className="w-full bg-surface-highest border-none rounded-md p-4 text-sm font-bold focus:ring-primary placeholder:text-zinc-700"
+              />
+            </div>
+            <div className="space-y-2 text-right">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase mr-1">Utilidad Neta</label>
+              <div className="p-4 bg-primary/10 rounded-md">
+                <span className="text-primary font-black">${netUtility.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase ml-1">Costo Insumos</label>
+              <input 
+                type="number"
+                value={consumableCost || ''}
+                onChange={(e) => setConsumableCost(Number(e.target.value))}
+                placeholder="$0.00"
+                className="w-full bg-surface-highest border-none rounded-md p-4 text-sm font-bold focus:ring-primary placeholder:text-zinc-700 font-sans"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-500 uppercase ml-1">Otros Costos</label>
+              <input 
+                type="number"
+                value={otherCosts || ''}
+                onChange={(e) => setOtherCosts(Number(e.target.value))}
+                placeholder="$0.00"
+                className="w-full bg-surface-highest border-none rounded-md p-4 text-sm font-bold focus:ring-primary placeholder:text-zinc-700 font-sans"
+              />
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-white/5 space-y-4">
+            <div className="flex justify-between items-center">
+              <label className="text-[10px] font-black text-primary uppercase tracking-widest">ASIGNACIÓN DE UTILIDAD</label>
+              {!isDistributionValid && (
+                <span className="text-[8px] font-bold text-red-500 uppercase animate-pulse">Excede Utilidad Disponible</span>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-zinc-500 uppercase ml-1">Para Reinversión</label>
+                <input 
+                  type="number"
+                  value={reinvestedAmount || ''}
+                  onChange={(e) => setReinvestedAmount(Number(e.target.value))}
+                  placeholder="$0.00"
+                  className={cn(
+                    "w-full bg-surface-highest border-none rounded-md p-4 text-sm font-bold focus:ring-primary placeholder:text-zinc-700 font-sans",
+                    !isDistributionValid && "text-red-500 ring-1 ring-red-500"
+                  )}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold text-zinc-500 uppercase ml-1">Para Reparto</label>
+                <input 
+                  type="number"
+                  value={distributedAmount || ''}
+                  onChange={(e) => setDistributedAmount(Number(e.target.value))}
+                  placeholder="$0.00"
+                  className={cn(
+                    "w-full bg-surface-highest border-none rounded-md p-4 text-sm font-bold focus:ring-primary placeholder:text-zinc-700 font-sans",
+                    !isDistributionValid && "text-red-500 ring-1 ring-red-500"
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-3">
         <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 px-1">INFORMACIÓN DEL CLIENTE</h3>
         <div className="bg-surface-high p-6 rounded-lg border border-white/5 space-y-4">
           <div className="space-y-2">
@@ -684,7 +780,8 @@ export const ActiveReception = ({ onConfirm }: { onConfirm: () => void }) => {
       <section className="pt-6">
         <Button 
           onClick={handleConfirm}
-          className="w-full h-16 rounded-md font-black uppercase tracking-widest text-lg flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(63,255,139,0.2)]"
+          disabled={!isDistributionValid || grossIncome <= 0}
+          className="w-full h-16 rounded-md font-black uppercase tracking-widest text-lg flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(63,255,139,0.2)] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
         >
           CONCLUIR RECEPCIÓN
           <ArrowRight className="w-6 h-6" />

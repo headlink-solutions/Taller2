@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Menu, Bell, LayoutGrid, Search, SlidersHorizontal, Calendar, Package, CarFront, X, Lock } from 'lucide-react';
+import { Menu, Bell, LayoutGrid, Search, SlidersHorizontal, Calendar, Package, CarFront, X, Lock, TrendingUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Dashboard } from './components/Dashboard';
 import { Reception } from './components/Reception';
 import { ActiveReception, TaskInProgress } from './components/Task';
 import { CalendarView } from './components/CalendarView';
+import { FinancialModule } from './components/FinancialModule';
 import { View } from './types';
 import { cn } from './lib/utils';
 
@@ -24,6 +25,8 @@ export default function App() {
         return <TaskInProgress />;
       case 'calendar':
         return <CalendarView />;
+      case 'finance':
+        return <FinancialModule />;
       case 'supplies':
         return (
           <div className="flex flex-col items-center justify-center h-[60vh] text-zinc-500">
@@ -77,6 +80,7 @@ export default function App() {
                   { id: 'dashboard', label: 'Dashboard', icon: <LayoutGrid className="w-5 h-5" /> },
                   { id: 'active-reception', label: 'Recepción', icon: <CarFront className="w-5 h-5" /> },
                   { id: 'calendar', label: 'Calendario', icon: <Calendar className="w-5 h-5" /> },
+                  { id: 'finance', label: 'Finanzas', icon: <TrendingUp className="w-5 h-5" /> },
                   { id: 'supplies', label: 'Suministros', icon: <Package className="w-5 h-5" /> },
                 ].map((item) => (
                   <button
@@ -161,6 +165,15 @@ export default function App() {
               )}
             >
               Calendario
+            </button>
+            <button 
+              onClick={() => setCurrentView('finance')}
+              className={cn(
+                "font-sans tracking-tight font-bold uppercase text-[10px] transition-all px-2 py-1 rounded",
+                currentView === 'finance' ? "text-primary" : "text-zinc-500 hover:bg-surface-high"
+              )}
+            >
+              Finanzas
             </button>
             <button 
               onClick={() => setCurrentView('supplies')}
